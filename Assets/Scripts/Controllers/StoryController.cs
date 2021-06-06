@@ -15,7 +15,7 @@ public class StoryController : DefaultSceneController
     private ScrollRect scrollRect;
     private Button ButtonAdd;
 
-
+    public Sprite[] Bookmarks;
 
     // Start is called before the first frame update
     void Start()
@@ -29,9 +29,11 @@ public class StoryController : DefaultSceneController
     IEnumerator ShowStories()
     {
         using (UnityWebRequest www = UnityWebRequest.Get(DataStore.basePath + "api/stories/"+DataStore.id))
+        //using (UnityWebRequest www = UnityWebRequest.Get(DataStore.basePath + "api/stories/1"))
         {
             www.SetRequestHeader("Authorization", DataStore.token_type + " " + DataStore.token);
-
+            //www.SetRequestHeader("Authorization", "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIyIiwianRpIjoiY2EyMmU1MzEwNjM3MDFjZmY4YTMwYjQyZjgzZDEyODVjZDI1NjFiNjMyMjFlY2E3ZDkyMjEwZGVlOGFhMmM1MDYxMTlhMDg3Yzk0NmM0ZjYiLCJpYXQiOjE2MjIwNDM2NzIuMjQ5MjA3LCJuYmYiOjE2MjIwNDM2NzIuMjQ5MjE0LCJleHAiOjE2NTM1Nzk2NzIuMjM1MTQ3LCJzdWIiOiIxIiwic2NvcGVzIjpbXX0.DsolNt_LeIE9n8kL63rrXoTpWULDX5xhzNt4ZODQRWpDGgY3OHcyfji-Qo1opxByvqrCnFqoWpL-30_hwkQXmDZS9TPPuzZbgG6y-oHGbQUC_nwI54rVBGZ77UAjyX12PIc9BQdk1Ka1v-ChHNbAuI-ei1MhLYpvnPiqrp4Eon8Lo0Fzz30EcI64mqe80mp_8chwXTOcWbm7K0-OhyUDOMylJhiEuWF6Zp4JPoDKg8QjSLnyfhGZeRDDgTXRHzLHeZiaTm4rmo4TknrJhY2ySbzXZGTLBCkcPhr_XOhRjBBDQc1OzsqZQdC6lnd99SWdnAt9YKEtp1MXlRt9tcH9DzeqiM2c2m2UihkKpuAWoGSM3I4hzuopv3mauQxDi4-K-eZ7oqtF-EnIxDzVx3abwqOYUgR3Lv2KLX-YdoJa0hgdijM0TOkJdMkz2rwvbcfb8lkL0RJlZA3OySv_fGJt1aLbsmXtl_XD6ii-DbC52llVpbe5fYjl6plGGifuL5ux_n4uaHpUP6MjecIsmaJ1RASTwixBlf8KHl5YZLGREmFz2lRNd9tMV4h4FYdbVZJrra46lb2B2xkDbEchQXrlN7DhS1ogOLXIZ17yYL-JZ3OcMT7ri7BVZk2WYFyOnJz895nz_jR569wKEd1NYYomPKXr8lh7PfQUbNTON3PrvfU");
+            
             yield return www.SendWebRequest();
 
             if (www.result != UnityWebRequest.Result.Success)
@@ -50,7 +52,6 @@ public class StoryController : DefaultSceneController
                 label.GetComponentInChildren<Text>().text = "Оригинальное название:";
 
                 label = Instantiate(text, scrollRect.content.transform);
-                label.GetComponentInChildren<Text>().fontStyle = FontStyle.Normal;
                 label.GetComponentInChildren<Text>().text = root.data[0].name_original;
 
                 label = Instantiate(text, scrollRect.content.transform);
@@ -58,7 +59,6 @@ public class StoryController : DefaultSceneController
                 label.GetComponentInChildren<Text>().text = "Русское название:";
 
                 label = Instantiate(text, scrollRect.content.transform);
-                label.GetComponentInChildren<Text>().fontStyle = FontStyle.Normal;
                 label.GetComponentInChildren<Text>().text = root.data[0].name_rus;
 
                 label = Instantiate(text, scrollRect.content.transform);
@@ -66,7 +66,6 @@ public class StoryController : DefaultSceneController
                 label.GetComponentInChildren<Text>().text = "Описание:";
 
                 label = Instantiate(text, scrollRect.content.transform);
-                label.GetComponentInChildren<Text>().fontStyle = FontStyle.Normal;
                 label.GetComponentInChildren<Text>().text = root.data[0].description;
 
                 label = Instantiate(text, scrollRect.content.transform);
@@ -76,7 +75,6 @@ public class StoryController : DefaultSceneController
                 foreach (Author authors in root.data[0].authors)
                 {
                     label = Instantiate(text, scrollRect.content.transform);
-                    label.GetComponentInChildren<Text>().fontStyle = FontStyle.Normal;
                     label.GetComponentInChildren<Text>().text = authors.name;
                 }
 
@@ -84,26 +82,25 @@ public class StoryController : DefaultSceneController
                 label.GetComponentInChildren<Text>().fontStyle = FontStyle.Bold;
                 label.GetComponentInChildren<Text>().text = "Жанры:";
 
+                label = Instantiate(text, scrollRect.content.transform);
+                label.GetComponentInChildren<Text>().text = "";
                 foreach (Genre genres in root.data[0].genres)
                 {
-                    label = Instantiate(text, scrollRect.content.transform);
-                    label.GetComponentInChildren<Text>().fontStyle = FontStyle.Normal;
-                    label.GetComponentInChildren<Text>().text = genres.name;
+                    label.GetComponentInChildren<Text>().text += genres.name+"; ";
                 }
 
                 label = Instantiate(text, scrollRect.content.transform);
                 label.GetComponentInChildren<Text>().fontStyle = FontStyle.Bold;
                 label.GetComponentInChildren<Text>().text = "Тэги:";
 
+                label = Instantiate(text, scrollRect.content.transform);
+                label.GetComponentInChildren<Text>().text = "";
                 foreach (Tag tags in root.data[0].tags)
                 {
-                    label = Instantiate(text, scrollRect.content.transform);
-                    label.GetComponentInChildren<Text>().fontStyle = FontStyle.Normal;
-                    label.GetComponentInChildren<Text>().text = tags.name;
+                    label.GetComponentInChildren<Text>().text += tags.name + "; ";
                 }
 
                 StartCoroutine(ShowChapters());
-                //StartCoroutine(ShowMarks());
             }
         }
     }
@@ -111,8 +108,10 @@ public class StoryController : DefaultSceneController
     IEnumerator ShowChapters()
     {
         using (UnityWebRequest www = UnityWebRequest.Get(DataStore.basePath + "api/stories/"+DataStore.id+"/chapters"))
+        //using (UnityWebRequest www = UnityWebRequest.Get(DataStore.basePath + "api/stories/1/chapters"))
         {
             www.SetRequestHeader("Authorization", DataStore.token_type + " " + DataStore.token);
+            //www.SetRequestHeader("Authorization", "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIyIiwianRpIjoiY2EyMmU1MzEwNjM3MDFjZmY4YTMwYjQyZjgzZDEyODVjZDI1NjFiNjMyMjFlY2E3ZDkyMjEwZGVlOGFhMmM1MDYxMTlhMDg3Yzk0NmM0ZjYiLCJpYXQiOjE2MjIwNDM2NzIuMjQ5MjA3LCJuYmYiOjE2MjIwNDM2NzIuMjQ5MjE0LCJleHAiOjE2NTM1Nzk2NzIuMjM1MTQ3LCJzdWIiOiIxIiwic2NvcGVzIjpbXX0.DsolNt_LeIE9n8kL63rrXoTpWULDX5xhzNt4ZODQRWpDGgY3OHcyfji-Qo1opxByvqrCnFqoWpL-30_hwkQXmDZS9TPPuzZbgG6y-oHGbQUC_nwI54rVBGZ77UAjyX12PIc9BQdk1Ka1v-ChHNbAuI-ei1MhLYpvnPiqrp4Eon8Lo0Fzz30EcI64mqe80mp_8chwXTOcWbm7K0-OhyUDOMylJhiEuWF6Zp4JPoDKg8QjSLnyfhGZeRDDgTXRHzLHeZiaTm4rmo4TknrJhY2ySbzXZGTLBCkcPhr_XOhRjBBDQc1OzsqZQdC6lnd99SWdnAt9YKEtp1MXlRt9tcH9DzeqiM2c2m2UihkKpuAWoGSM3I4hzuopv3mauQxDi4-K-eZ7oqtF-EnIxDzVx3abwqOYUgR3Lv2KLX-YdoJa0hgdijM0TOkJdMkz2rwvbcfb8lkL0RJlZA3OySv_fGJt1aLbsmXtl_XD6ii-DbC52llVpbe5fYjl6plGGifuL5ux_n4uaHpUP6MjecIsmaJ1RASTwixBlf8KHl5YZLGREmFz2lRNd9tMV4h4FYdbVZJrra46lb2B2xkDbEchQXrlN7DhS1ogOLXIZ17yYL-JZ3OcMT7ri7BVZk2WYFyOnJz895nz_jR569wKEd1NYYomPKXr8lh7PfQUbNTON3PrvfU");
 
             yield return www.SendWebRequest();
 
@@ -126,7 +125,8 @@ public class StoryController : DefaultSceneController
 
                 GameObject label = Instantiate(text, scrollRect.content.transform);
                 label.GetComponentInChildren<Text>().fontStyle = FontStyle.Bold;
-                label.GetComponentInChildren<Text>().text = "Главы:";
+                label.GetComponentInChildren<Text>().fontSize = 12;
+                label.GetComponentInChildren<Text>().text = "\nГлавы:";
 
                 foreach (Chapter data in root.data)
                 {
@@ -145,8 +145,10 @@ public class StoryController : DefaultSceneController
     IEnumerator ShowMarks()
     {
         using (UnityWebRequest www = UnityWebRequest.Get(DataStore.basePath + "api/stories/"+DataStore.id+"/feedback"))
+        //using (UnityWebRequest www = UnityWebRequest.Get(DataStore.basePath + "api/stories/1/feedback"))
         {
             www.SetRequestHeader("Authorization", DataStore.token_type + " " + DataStore.token);
+            //www.SetRequestHeader("Authorization", "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIyIiwianRpIjoiY2EyMmU1MzEwNjM3MDFjZmY4YTMwYjQyZjgzZDEyODVjZDI1NjFiNjMyMjFlY2E3ZDkyMjEwZGVlOGFhMmM1MDYxMTlhMDg3Yzk0NmM0ZjYiLCJpYXQiOjE2MjIwNDM2NzIuMjQ5MjA3LCJuYmYiOjE2MjIwNDM2NzIuMjQ5MjE0LCJleHAiOjE2NTM1Nzk2NzIuMjM1MTQ3LCJzdWIiOiIxIiwic2NvcGVzIjpbXX0.DsolNt_LeIE9n8kL63rrXoTpWULDX5xhzNt4ZODQRWpDGgY3OHcyfji-Qo1opxByvqrCnFqoWpL-30_hwkQXmDZS9TPPuzZbgG6y-oHGbQUC_nwI54rVBGZ77UAjyX12PIc9BQdk1Ka1v-ChHNbAuI-ei1MhLYpvnPiqrp4Eon8Lo0Fzz30EcI64mqe80mp_8chwXTOcWbm7K0-OhyUDOMylJhiEuWF6Zp4JPoDKg8QjSLnyfhGZeRDDgTXRHzLHeZiaTm4rmo4TknrJhY2ySbzXZGTLBCkcPhr_XOhRjBBDQc1OzsqZQdC6lnd99SWdnAt9YKEtp1MXlRt9tcH9DzeqiM2c2m2UihkKpuAWoGSM3I4hzuopv3mauQxDi4-K-eZ7oqtF-EnIxDzVx3abwqOYUgR3Lv2KLX-YdoJa0hgdijM0TOkJdMkz2rwvbcfb8lkL0RJlZA3OySv_fGJt1aLbsmXtl_XD6ii-DbC52llVpbe5fYjl6plGGifuL5ux_n4uaHpUP6MjecIsmaJ1RASTwixBlf8KHl5YZLGREmFz2lRNd9tMV4h4FYdbVZJrra46lb2B2xkDbEchQXrlN7DhS1ogOLXIZ17yYL-JZ3OcMT7ri7BVZk2WYFyOnJz895nz_jR569wKEd1NYYomPKXr8lh7PfQUbNTON3PrvfU");
 
             yield return www.SendWebRequest();
 
@@ -160,13 +162,14 @@ public class StoryController : DefaultSceneController
 
                 GameObject label = Instantiate(text, scrollRect.content.transform);
                 label.GetComponentInChildren<Text>().fontStyle = FontStyle.Bold;
-                label.GetComponentInChildren<Text>().text = "Отзывы:";
+                label.GetComponentInChildren<Text>().fontSize = 12;
+                label.GetComponentInChildren<Text>().text = "\nОтзывы:";
 
                 foreach (Mark data in root.data)
                 {
                     label = Instantiate(text, scrollRect.content.transform);
                     label.GetComponentInChildren<Text>().text = data.name + " " + data.created_at + "\n";
-                    label.GetComponentInChildren<Text>().text += data.value + "\n";
+                    label.GetComponentInChildren<Text>().text += "<b>Оценка:</b> " + data.value + "\n";
                     label.GetComponentInChildren<Text>().text += data.description;
                     label.GetComponentInChildren<Text>().tag = "Feedback";
                 }
@@ -185,8 +188,10 @@ public class StoryController : DefaultSceneController
         form.AddField("description", desc);
 
         using (UnityWebRequest www = UnityWebRequest.Post(DataStore.basePath + "api/stories/" + DataStore.id+ "/feedback", form))
+        //using (UnityWebRequest www = UnityWebRequest.Post(DataStore.basePath + "api/stories/1/feedback", form))
         {
             www.SetRequestHeader("Authorization", DataStore.token_type + " " + DataStore.token);
+            //www.SetRequestHeader("Authorization", "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIyIiwianRpIjoiY2EyMmU1MzEwNjM3MDFjZmY4YTMwYjQyZjgzZDEyODVjZDI1NjFiNjMyMjFlY2E3ZDkyMjEwZGVlOGFhMmM1MDYxMTlhMDg3Yzk0NmM0ZjYiLCJpYXQiOjE2MjIwNDM2NzIuMjQ5MjA3LCJuYmYiOjE2MjIwNDM2NzIuMjQ5MjE0LCJleHAiOjE2NTM1Nzk2NzIuMjM1MTQ3LCJzdWIiOiIxIiwic2NvcGVzIjpbXX0.DsolNt_LeIE9n8kL63rrXoTpWULDX5xhzNt4ZODQRWpDGgY3OHcyfji-Qo1opxByvqrCnFqoWpL-30_hwkQXmDZS9TPPuzZbgG6y-oHGbQUC_nwI54rVBGZ77UAjyX12PIc9BQdk1Ka1v-ChHNbAuI-ei1MhLYpvnPiqrp4Eon8Lo0Fzz30EcI64mqe80mp_8chwXTOcWbm7K0-OhyUDOMylJhiEuWF6Zp4JPoDKg8QjSLnyfhGZeRDDgTXRHzLHeZiaTm4rmo4TknrJhY2ySbzXZGTLBCkcPhr_XOhRjBBDQc1OzsqZQdC6lnd99SWdnAt9YKEtp1MXlRt9tcH9DzeqiM2c2m2UihkKpuAWoGSM3I4hzuopv3mauQxDi4-K-eZ7oqtF-EnIxDzVx3abwqOYUgR3Lv2KLX-YdoJa0hgdijM0TOkJdMkz2rwvbcfb8lkL0RJlZA3OySv_fGJt1aLbsmXtl_XD6ii-DbC52llVpbe5fYjl6plGGifuL5ux_n4uaHpUP6MjecIsmaJ1RASTwixBlf8KHl5YZLGREmFz2lRNd9tMV4h4FYdbVZJrra46lb2B2xkDbEchQXrlN7DhS1ogOLXIZ17yYL-JZ3OcMT7ri7BVZk2WYFyOnJz895nz_jR569wKEd1NYYomPKXr8lh7PfQUbNTON3PrvfU");
             yield return www.SendWebRequest();
 
             if (www.result != UnityWebRequest.Result.Success)
@@ -208,6 +213,7 @@ public class StoryController : DefaultSceneController
         using (UnityWebRequest www = UnityWebRequest.Get(DataStore.basePath + "api/downloads/"+DataStore.id))
         {
             www.SetRequestHeader("Authorization", DataStore.token_type + " " + DataStore.token);
+            //www.SetRequestHeader("Authorization", "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIyIiwianRpIjoiY2EyMmU1MzEwNjM3MDFjZmY4YTMwYjQyZjgzZDEyODVjZDI1NjFiNjMyMjFlY2E3ZDkyMjEwZGVlOGFhMmM1MDYxMTlhMDg3Yzk0NmM0ZjYiLCJpYXQiOjE2MjIwNDM2NzIuMjQ5MjA3LCJuYmYiOjE2MjIwNDM2NzIuMjQ5MjE0LCJleHAiOjE2NTM1Nzk2NzIuMjM1MTQ3LCJzdWIiOiIxIiwic2NvcGVzIjpbXX0.DsolNt_LeIE9n8kL63rrXoTpWULDX5xhzNt4ZODQRWpDGgY3OHcyfji-Qo1opxByvqrCnFqoWpL-30_hwkQXmDZS9TPPuzZbgG6y-oHGbQUC_nwI54rVBGZ77UAjyX12PIc9BQdk1Ka1v-ChHNbAuI-ei1MhLYpvnPiqrp4Eon8Lo0Fzz30EcI64mqe80mp_8chwXTOcWbm7K0-OhyUDOMylJhiEuWF6Zp4JPoDKg8QjSLnyfhGZeRDDgTXRHzLHeZiaTm4rmo4TknrJhY2ySbzXZGTLBCkcPhr_XOhRjBBDQc1OzsqZQdC6lnd99SWdnAt9YKEtp1MXlRt9tcH9DzeqiM2c2m2UihkKpuAWoGSM3I4hzuopv3mauQxDi4-K-eZ7oqtF-EnIxDzVx3abwqOYUgR3Lv2KLX-YdoJa0hgdijM0TOkJdMkz2rwvbcfb8lkL0RJlZA3OySv_fGJt1aLbsmXtl_XD6ii-DbC52llVpbe5fYjl6plGGifuL5ux_n4uaHpUP6MjecIsmaJ1RASTwixBlf8KHl5YZLGREmFz2lRNd9tMV4h4FYdbVZJrra46lb2B2xkDbEchQXrlN7DhS1ogOLXIZ17yYL-JZ3OcMT7ri7BVZk2WYFyOnJz895nz_jR569wKEd1NYYomPKXr8lh7PfQUbNTON3PrvfU");
 
             yield return www.SendWebRequest();
 
@@ -222,14 +228,14 @@ public class StoryController : DefaultSceneController
                 ButtonAdd.onClick.RemoveAllListeners();
                 if (root.data.Count != 0)
                 {
-                    ButtonAdd.GetComponentInChildren<Text>().text = "-";
+                    ButtonAdd.GetComponent<Image>().sprite = Bookmarks[0];                    
                     ButtonAdd.onClick.AddListener(delegate {
                         StartCoroutine(DestroyDownload());
                     });
                 }
                 else
                 {
-                    ButtonAdd.GetComponentInChildren<Text>().text = "+";
+                    ButtonAdd.GetComponent<Image>().sprite = Bookmarks[1];
                     ButtonAdd.onClick.AddListener(delegate {
                         StartCoroutine(AppendDownload());
                     });
@@ -243,6 +249,7 @@ public class StoryController : DefaultSceneController
         using (UnityWebRequest www = UnityWebRequest.Get(DataStore.basePath + "api/stories/"+DataStore.id + "/add"))
         {
             www.SetRequestHeader("Authorization", DataStore.token_type + " " + DataStore.token);
+            //www.SetRequestHeader("Authorization", "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIyIiwianRpIjoiY2EyMmU1MzEwNjM3MDFjZmY4YTMwYjQyZjgzZDEyODVjZDI1NjFiNjMyMjFlY2E3ZDkyMjEwZGVlOGFhMmM1MDYxMTlhMDg3Yzk0NmM0ZjYiLCJpYXQiOjE2MjIwNDM2NzIuMjQ5MjA3LCJuYmYiOjE2MjIwNDM2NzIuMjQ5MjE0LCJleHAiOjE2NTM1Nzk2NzIuMjM1MTQ3LCJzdWIiOiIxIiwic2NvcGVzIjpbXX0.DsolNt_LeIE9n8kL63rrXoTpWULDX5xhzNt4ZODQRWpDGgY3OHcyfji-Qo1opxByvqrCnFqoWpL-30_hwkQXmDZS9TPPuzZbgG6y-oHGbQUC_nwI54rVBGZ77UAjyX12PIc9BQdk1Ka1v-ChHNbAuI-ei1MhLYpvnPiqrp4Eon8Lo0Fzz30EcI64mqe80mp_8chwXTOcWbm7K0-OhyUDOMylJhiEuWF6Zp4JPoDKg8QjSLnyfhGZeRDDgTXRHzLHeZiaTm4rmo4TknrJhY2ySbzXZGTLBCkcPhr_XOhRjBBDQc1OzsqZQdC6lnd99SWdnAt9YKEtp1MXlRt9tcH9DzeqiM2c2m2UihkKpuAWoGSM3I4hzuopv3mauQxDi4-K-eZ7oqtF-EnIxDzVx3abwqOYUgR3Lv2KLX-YdoJa0hgdijM0TOkJdMkz2rwvbcfb8lkL0RJlZA3OySv_fGJt1aLbsmXtl_XD6ii-DbC52llVpbe5fYjl6plGGifuL5ux_n4uaHpUP6MjecIsmaJ1RASTwixBlf8KHl5YZLGREmFz2lRNd9tMV4h4FYdbVZJrra46lb2B2xkDbEchQXrlN7DhS1ogOLXIZ17yYL-JZ3OcMT7ri7BVZk2WYFyOnJz895nz_jR569wKEd1NYYomPKXr8lh7PfQUbNTON3PrvfU");
 
             yield return www.SendWebRequest();
 
@@ -252,7 +259,7 @@ public class StoryController : DefaultSceneController
             }
             else
             {
-                ButtonAdd.GetComponentInChildren<Text>().text = "-";
+                ButtonAdd.GetComponent<Image>().sprite = Bookmarks[0];
                 ButtonAdd.onClick.RemoveAllListeners();
                 ButtonAdd.onClick.AddListener(delegate {
                     StartCoroutine(DestroyDownload());
@@ -266,6 +273,7 @@ public class StoryController : DefaultSceneController
         using (UnityWebRequest www = UnityWebRequest.Delete(DataStore.basePath + "api/downloads/" + DataStore.id + "/destroy"))
         {
             www.SetRequestHeader("Authorization", DataStore.token_type + " " + DataStore.token);
+            //www.SetRequestHeader("Authorization", "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIyIiwianRpIjoiY2EyMmU1MzEwNjM3MDFjZmY4YTMwYjQyZjgzZDEyODVjZDI1NjFiNjMyMjFlY2E3ZDkyMjEwZGVlOGFhMmM1MDYxMTlhMDg3Yzk0NmM0ZjYiLCJpYXQiOjE2MjIwNDM2NzIuMjQ5MjA3LCJuYmYiOjE2MjIwNDM2NzIuMjQ5MjE0LCJleHAiOjE2NTM1Nzk2NzIuMjM1MTQ3LCJzdWIiOiIxIiwic2NvcGVzIjpbXX0.DsolNt_LeIE9n8kL63rrXoTpWULDX5xhzNt4ZODQRWpDGgY3OHcyfji-Qo1opxByvqrCnFqoWpL-30_hwkQXmDZS9TPPuzZbgG6y-oHGbQUC_nwI54rVBGZ77UAjyX12PIc9BQdk1Ka1v-ChHNbAuI-ei1MhLYpvnPiqrp4Eon8Lo0Fzz30EcI64mqe80mp_8chwXTOcWbm7K0-OhyUDOMylJhiEuWF6Zp4JPoDKg8QjSLnyfhGZeRDDgTXRHzLHeZiaTm4rmo4TknrJhY2ySbzXZGTLBCkcPhr_XOhRjBBDQc1OzsqZQdC6lnd99SWdnAt9YKEtp1MXlRt9tcH9DzeqiM2c2m2UihkKpuAWoGSM3I4hzuopv3mauQxDi4-K-eZ7oqtF-EnIxDzVx3abwqOYUgR3Lv2KLX-YdoJa0hgdijM0TOkJdMkz2rwvbcfb8lkL0RJlZA3OySv_fGJt1aLbsmXtl_XD6ii-DbC52llVpbe5fYjl6plGGifuL5ux_n4uaHpUP6MjecIsmaJ1RASTwixBlf8KHl5YZLGREmFz2lRNd9tMV4h4FYdbVZJrra46lb2B2xkDbEchQXrlN7DhS1ogOLXIZ17yYL-JZ3OcMT7ri7BVZk2WYFyOnJz895nz_jR569wKEd1NYYomPKXr8lh7PfQUbNTON3PrvfU");
 
             yield return www.SendWebRequest();
 
@@ -275,7 +283,7 @@ public class StoryController : DefaultSceneController
             }
             else
             {
-                ButtonAdd.GetComponentInChildren<Text>().text = "+";
+                ButtonAdd.GetComponent<Image>().sprite = Bookmarks[1];
                 ButtonAdd.onClick.RemoveAllListeners();
                 ButtonAdd.onClick.AddListener(delegate
                 {
