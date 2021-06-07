@@ -11,9 +11,9 @@ public class CatalogController : DefaultSceneController
     public int size;
     public GameObject PrefabButton;
     public GameObject PrefabBook;
-    private ScrollRect GenresRect;
-    private ScrollRect TagsRect;
-    private ScrollRect AuthorsRect;
+    public ScrollRect GenresRect;
+    public ScrollRect TagsRect;
+    public ScrollRect AuthorsRect;
     private ScrollRect AllBooks;
 
     public GameObject PanelAllBooks;
@@ -29,11 +29,8 @@ public class CatalogController : DefaultSceneController
     // Start is called before the first frame update
     void Start()
     {
-        AuthorsRect = GameObject.Find("AuthorsView").GetComponent<ScrollRect>();
-        GenresRect = GameObject.Find("GenresView").GetComponent<ScrollRect>();
-        TagsRect = GameObject.Find("TagsView").GetComponent<ScrollRect>();
         CloseAllPanel();
-        UpdateDataButton();
+        ShowAllStories();
     }
 
     public void UpdateDataButton()
@@ -69,7 +66,7 @@ public class CatalogController : DefaultSceneController
             }
             else
             {
-                Root root = JsonConvert.DeserializeObject<Root>(www.downloadHandler.text);
+                DataRoot root = JsonConvert.DeserializeObject<DataRoot>(www.downloadHandler.text);
 
                 foreach (Data data in root.data)
                 {
@@ -108,7 +105,7 @@ public class CatalogController : DefaultSceneController
             }
             else
             {
-                Root root = JsonConvert.DeserializeObject<Root>(www.downloadHandler.text);
+                DataRoot root = JsonConvert.DeserializeObject<DataRoot>(www.downloadHandler.text);
 
                 foreach (Data data in root.data)
                 {
@@ -147,7 +144,7 @@ public class CatalogController : DefaultSceneController
             }
             else
             {
-                Root root = JsonConvert.DeserializeObject<Root>(www.downloadHandler.text);
+                DataRoot root = JsonConvert.DeserializeObject<DataRoot>(www.downloadHandler.text);
 
                 foreach (Data data in root.data)
                 {

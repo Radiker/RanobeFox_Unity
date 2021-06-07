@@ -292,4 +292,32 @@ public class StoryController : DefaultSceneController
             }
         }
     }
+
+    public void ClickDeleteButton()
+    {
+        StartCoroutine(DeleteStory());
+    }
+    IEnumerator DeleteStory()
+    {
+        using (UnityWebRequest www = UnityWebRequest.Delete(DataStore.basePath + "api/stories/" + DataStore.id + "/destroy"))
+        {
+            www.SetRequestHeader("Authorization", DataStore.token_type + " " + DataStore.token);
+
+            yield return www.SendWebRequest();
+
+            if (www.result != UnityWebRequest.Result.Success)
+            {
+                Debug.Log(www.error);
+            }
+            else
+            {
+                LoadScene("MainScene");
+            }
+        }
+    }
+
+    public void ClickButtonCreateChapter()
+    {
+        LoadScene("CreateChapterScene");
+    }
 }

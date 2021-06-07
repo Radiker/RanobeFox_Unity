@@ -26,4 +26,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/CreateBookScene.unity
     guid: 11bb840f461897e4b952ca7b91bc75e1
+  - enabled: 1
+    path: Assets/Scenes/CreateChapterScene.unity
+    guid: 963243e2b6e18494cb1e952d91a069e2
   m_configObjects: {}

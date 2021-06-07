@@ -32,7 +32,6 @@ public class ChapterController : DefaultSceneController
             }
             else
             {
-                Debug.Log(www.downloadHandler.text);
                 ChapterAllRoot root = JsonConvert.DeserializeObject<ChapterAllRoot>(www.downloadHandler.text);
                 
                 GameObject label = Instantiate(text, scrollRect.content.transform);
@@ -47,6 +46,29 @@ public class ChapterController : DefaultSceneController
                 label = Instantiate(text, scrollRect.content.transform);
                 label.GetComponentInChildren<Text>().fontStyle = FontStyle.Normal;
                 label.GetComponentInChildren<Text>().text = root.data.text.ToString();
+            }
+        }
+    }
+
+    public void ClickDeleteButton()
+    {
+        StartCoroutine(DeleteData());
+    }
+    IEnumerator DeleteData()
+    {
+        using (UnityWebRequest www = UnityWebRequest.Delete(DataStore.basePath + "api/chapters/" + DataStore.id + "/destroy"))
+        {
+            www.SetRequestHeader("Authorization", DataStore.token_type + " " + DataStore.token);
+
+            yield return www.SendWebRequest();
+
+            if (www.result != UnityWebRequest.Result.Success)
+            {
+                Debug.Log(www.error);
+            }
+            else
+            {
+                LoadScene("MainScene");
             }
         }
     }
