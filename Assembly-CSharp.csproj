@@ -67,10 +67,10 @@
     <Compile Include="Assets\Scripts\Controllers\ChapterController.cs" />
     <Compile Include="Assets\Scripts\FileIconButton.cs" />
     <Compile Include="Assets\Scripts\Controllers\MyLibController.cs" />
+    <Compile Include="Assets\Scripts\Controllers\CreateChapterController.cs" />
     <Compile Include="Assets\Scripts\ImageLoader.cs" />
     <Compile Include="Assets\Scripts\Controllers\CreateBookController.cs" />
     <Compile Include="Assets\Scripts\DataButton.cs" />
-    <Compile Include="Assets\Scripts\Controllers\CreateChapterController.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />

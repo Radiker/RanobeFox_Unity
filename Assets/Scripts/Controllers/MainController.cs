@@ -9,9 +9,12 @@ public class MainController : DefaultSceneController
 {
     public GameObject PrefabButtonBook;
 
+    private InputField InputQuary;
+
     // Start is called before the first frame update
     void Start()
     {
+        InputQuary = GameObject.Find("InputQuary").GetComponent<InputField>();
         StartCoroutine(ShowLatestStory());
     }
 
@@ -46,5 +49,12 @@ public class MainController : DefaultSceneController
                 }
             }
         }
+    }
+
+    public void Search()
+    {
+        DataStore.Query = InputQuary.text;
+        DataStore.Search = true;
+        LoadScene("CatalogScene");
     }
 }

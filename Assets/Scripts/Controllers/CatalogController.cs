@@ -14,6 +14,7 @@ public class CatalogController : DefaultSceneController
     public ScrollRect GenresRect;
     public ScrollRect TagsRect;
     public ScrollRect AuthorsRect;
+    private InputField InputQuary;
     private ScrollRect AllBooks;
 
     public GameObject PanelAllBooks;
@@ -23,12 +24,16 @@ public class CatalogController : DefaultSceneController
     public GameObject PanelDelete;
     public GameObject PanelCreate;
 
+    private int Filter = 0;
     private string path;
     private int id;
 
     // Start is called before the first frame update
     void Start()
     {
+        InputQuary = GameObject.Find("InputQuary").GetComponent<InputField>();
+        if (DataStore.Search)
+            InputQuary.text = DataStore.Query;
         CloseAllPanel();
         ShowAllStories();
     }
@@ -151,7 +156,9 @@ public class CatalogController : DefaultSceneController
                     GameObject newButton = Instantiate(PrefabButton, AuthorsRect.content.transform);
                     newButton.GetComponentInChildren<Text>().text = data.name;
 
-                    newButton.GetComponent<DataButton>().ButtonInfo.onClick.AddListener(delegate { 
+                    newButton.GetComponent<DataButton>().ButtonInfo.onClick.AddListener(delegate {
+                        Filter = 1;
+
                         Debug.Log(data.id); 
                     });
                     newButton.GetComponent<DataButton>().ButtonDelete.onClick.AddListener(delegate {
@@ -288,15 +295,48 @@ public class CatalogController : DefaultSceneController
 
                 foreach (Story story in storyRoot.data)
                 {
-                    GameObject newBook = Instantiate(PrefabBook, AllBooks.content.transform);
-                    newBook.GetComponentInChildren<ImageLoader>().url = DataStore.basePath + story.cover_link;
-                    newBook.GetComponentInChildren<Text>().text = story.name_rus;
-                    newBook.GetComponent<Button>().onClick.AddListener(delegate {
-                        DataStore.id = story.id;
-                        LoadScene("BookScene");
-                    });
+                    if (DataStore.Search)
+                    {
+                        if (story.name_rus.IndexOf(DataStore.Query, StringComparison.CurrentCultureIgnoreCase) != -1)
+                        {
+                            GameObject newBook = Instantiate(PrefabBook, AllBooks.content.transform);
+                            newBook.GetComponentInChildren<ImageLoader>().url = DataStore.basePath + story.cover_link;
+                            newBook.GetComponentInChildren<Text>().text = story.name_rus;
+                            newBook.GetComponent<Button>().onClick.AddListener(delegate
+                            {
+                                DataStore.id = story.id;
+                                LoadScene("BookScene");
+                            });
+                        }
+                    }
+                    else
+                    {
+                        GameObject newBook = Instantiate(PrefabBook, AllBooks.content.transform);
+                        newBook.GetComponentInChildren<ImageLoader>().url = DataStore.basePath + story.cover_link;
+                        newBook.GetComponentInChildren<Text>().text = story.name_rus;
+                        newBook.GetComponent<Button>().onClick.AddListener(delegate
+                        {
+                            DataStore.id = story.id;
+                            LoadScene("BookScene");
+                        });
+                    }
                 }
             }
         }
     }
+
+    public void Search()
+    {
+        DataStore.Query = InputQuary.text;
+        DataStore.Search = true;
+        ShowAllStories();
+    }
+
+    public void CanselSearch()
+    {
+        DataStore.Search = false;
+        InputQuary.text = "";
+        ShowAllStories();
+    }
+
 }

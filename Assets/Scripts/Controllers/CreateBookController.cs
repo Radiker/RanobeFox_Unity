@@ -33,15 +33,19 @@ public class CreateBookController : DefaultSceneController
 
     public void LoadImageCover()
     {
-        DirectoryInfo dirInfo = new DirectoryInfo("/storage/emulated/0/Download/");
+        DirectoryInfo dirInfo = new DirectoryInfo(Application.persistentDataPath);
         FileInfo[] files;
 
         TextPathCover.text = Application.persistentDataPath;
         scrollViewImages.SetActive(true);
 
-        files = new string[] { "*.jpeg", "*.jpg", "*.png" }.SelectMany(ext => dirInfo.GetFiles(ext, SearchOption.AllDirectories)).ToArray();
-        
+        //files = new string[] { "*.jpeg", "*.jpg", "*.png" }.SelectMany(ext => dirInfo.GetFiles(ext, SearchOption.AllDirectories)).ToArray();
+        dirInfo = new DirectoryInfo("/storage/emulated/0/Download");
+        TextPathCover.text = dirInfo.ToString();
+        files = new string[] { "*.jpeg", "*.jpg", "*.png" }.SelectMany(ext => dirInfo.EnumerateFiles(ext, SearchOption.AllDirectories)).ToArray();
+        //files = dirInfo.GetFiles();
         TextPathCover.text = files.Length.ToString();
+
         foreach (FileInfo file in files)
         {
             FileIconButton fileIcon = Instantiate(FileIcon, scrollViewImages.GetComponent<ScrollRect>().content.transform).GetComponent<FileIconButton>();
@@ -52,9 +56,31 @@ public class CreateBookController : DefaultSceneController
                 scrollViewImages.SetActive(false);
             });
         }
-    }   
-    
+    }
 
+    public static string GetAndroidInternalFilesDir()
+    {
+        string[] potentialDirectories = new string[]
+        {
+        //"/mnt/sdcard/Download",
+        "/sdcard/Download",
+        "/storage/sdcard0/Download",
+        "/storage/sdcard1/Download",
+        "/storage/emulated/0/Download"
+        };
+
+        if (Application.platform == RuntimePlatform.Android)
+        {
+            for (int i = 0; i < potentialDirectories.Length; i++)
+            {
+                if (Directory.Exists(potentialDirectories[i]))
+                {
+                    return potentialDirectories[i];
+                }
+            }
+        }
+        return "";
+    }
 
     // Update is called once per frame
     public void OnButtonCreate()
