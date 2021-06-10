@@ -16,6 +16,8 @@ public class StoryController : DefaultSceneController
     private Button ButtonAdd;
 
     public Sprite[] Bookmarks;
+    public GameObject PrefabButton;
+    public ScrollRect scrollDataRect;
 
     // Start is called before the first frame update
     void Start()
@@ -319,5 +321,174 @@ public class StoryController : DefaultSceneController
     public void ClickButtonCreateChapter()
     {
         LoadScene("CreateChapterScene");
+    }
+    public void ClickAddAuthor()
+    {
+        GameObject[] prefabs = GameObject.FindGameObjectsWithTag("DataButton");
+        foreach(GameObject prefab in prefabs)
+        {
+            Destroy(prefab.gameObject);
+        }
+        StartCoroutine(ShowAuthors());
+    }
+    public void ClickAddGenre()
+    {
+        GameObject[] prefabs = GameObject.FindGameObjectsWithTag("DataButton");
+        foreach (GameObject prefab in prefabs)
+        {
+            Destroy(prefab.gameObject);
+        }
+        StartCoroutine(ShowGenres());
+    }
+    public void ClickAddTag()
+    {
+        GameObject[] prefabs = GameObject.FindGameObjectsWithTag("DataButton");
+        foreach (GameObject prefab in prefabs)
+        {
+            Destroy(prefab.gameObject);
+        }
+        StartCoroutine(ShowTags());
+    }
+
+    IEnumerator ShowGenres()
+    {
+        using (UnityWebRequest www = UnityWebRequest.Get(DataStore.basePath + "api/genres"))
+        {
+            www.SetRequestHeader("Authorization", DataStore.token_type + " " + DataStore.token);
+
+            yield return www.SendWebRequest();
+
+            if (www.result != UnityWebRequest.Result.Success)
+            {
+                Debug.Log(www.error);
+            }
+            else
+            {
+                DataRoot root = JsonConvert.DeserializeObject<DataRoot>(www.downloadHandler.text);
+
+                foreach (Data data in root.data)
+                {
+                    GameObject newButton = Instantiate(PrefabButton, scrollDataRect.content.transform);
+                    newButton.GetComponentInChildren<Text>().text = data.name;
+
+                    newButton.GetComponent<DataButton>().ButtonInfo.onClick.AddListener(delegate {
+                        StartCoroutine(AddGenres(data.id));
+                    });
+                }
+            }
+        }
+    }
+    IEnumerator AddGenres(int id)
+    {
+        using (UnityWebRequest www = UnityWebRequest.Get(DataStore.basePath + "api/stories/" + DataStore.id + "/genres/" + id))
+        {
+            www.SetRequestHeader("Authorization", DataStore.token_type + " " + DataStore.token);
+
+            yield return www.SendWebRequest();
+
+            if (www.result != UnityWebRequest.Result.Success)
+            {
+                Debug.Log(www.error);
+            }
+            else
+            {
+                LoadScene("BookScene");
+            }
+        }
+    }
+
+    IEnumerator ShowTags()
+    {
+        using (UnityWebRequest www = UnityWebRequest.Get(DataStore.basePath + "api/tags"))
+        {
+            www.SetRequestHeader("Authorization", DataStore.token_type + " " + DataStore.token);
+
+            yield return www.SendWebRequest();
+
+            if (www.result != UnityWebRequest.Result.Success)
+            {
+                Debug.Log(www.error);
+            }
+            else
+            {
+                DataRoot root = JsonConvert.DeserializeObject<DataRoot>(www.downloadHandler.text);
+
+                foreach (Data data in root.data)
+                {
+                    GameObject newButton = Instantiate(PrefabButton, scrollDataRect.content.transform);
+                    newButton.GetComponentInChildren<Text>().text = data.name;
+
+                    newButton.GetComponent<DataButton>().ButtonInfo.onClick.AddListener(delegate {
+                        StartCoroutine(AddTags(data.id));
+                    });
+                }
+            }
+        }
+    }
+    IEnumerator AddTags(int id)
+    {
+        using (UnityWebRequest www = UnityWebRequest.Get(DataStore.basePath + "api/stories/" + DataStore.id + "/tags/" + id))
+        {
+            www.SetRequestHeader("Authorization", DataStore.token_type + " " + DataStore.token);
+
+            yield return www.SendWebRequest();
+
+            if (www.result != UnityWebRequest.Result.Success)
+            {
+                Debug.Log(www.error);
+            }
+            else
+            {
+                LoadScene("BookScene");
+            }
+        }
+    }
+
+    IEnumerator ShowAuthors()
+    {
+        using (UnityWebRequest www = UnityWebRequest.Get(DataStore.basePath + "api/authors"))
+        {
+            www.SetRequestHeader("Authorization", DataStore.token_type + " " + DataStore.token);
+
+            yield return www.SendWebRequest();
+
+            if (www.result != UnityWebRequest.Result.Success)
+            {
+                Debug.Log(www.error);
+            }
+            else
+            {
+                DataRoot root = JsonConvert.DeserializeObject<DataRoot>(www.downloadHandler.text);
+
+                foreach (Data data in root.data)
+                {
+                    GameObject newButton = Instantiate(PrefabButton, scrollDataRect.content.transform);
+                    newButton.GetComponentInChildren<Text>().text = data.name;
+
+                    newButton.GetComponent<DataButton>().ButtonInfo.onClick.AddListener(delegate {
+                        StartCoroutine(AddAuthors(data.id));
+                    });
+                }
+            }
+        }
+    }
+
+    IEnumerator AddAuthors(int id)
+    {
+        using (UnityWebRequest www = UnityWebRequest.Get(DataStore.basePath + "api/stories/" + DataStore.id + "/authors/" + id))
+        {
+            www.SetRequestHeader("Authorization", DataStore.token_type + " " + DataStore.token);
+
+            yield return www.SendWebRequest();
+
+            if (www.result != UnityWebRequest.Result.Success)
+            {
+                Debug.Log(www.error);
+            }
+            else
+            {
+                LoadScene("BookScene");
+            }
+        }
     }
 }

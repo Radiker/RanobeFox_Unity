@@ -98,6 +98,14 @@ public class Response
     {
         public MiddleStory data { get; set; }
     }
+    public class MiddleStoryPivot : MiddleStory
+    {
+        public Pivot pivot { get; set; }
+    }
+    public class MiddleStoryPivotRoot : Root
+    {
+        public List<MiddleStoryPivot> data { get; set; }
+    }
     public class FullStory
     {
         public int id { get; set; }

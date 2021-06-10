@@ -18,6 +18,7 @@ public class CatalogController : DefaultSceneController
     private ScrollRect AllBooks;
 
     public GameObject PanelAllBooks;
+    public GameObject PanelAllFilters;
 
     public GameObject PanelInfo;
     public GameObject PanelUpdate;
@@ -78,6 +79,14 @@ public class CatalogController : DefaultSceneController
                     GameObject newButton = Instantiate(PrefabButton, GenresRect.content.transform);
                     newButton.GetComponentInChildren<Text>().text = data.name;
 
+                    newButton.GetComponent<DataButton>().ButtonInfo.onClick.AddListener(delegate {
+                        PanelAllBooks.SetActive(true);
+                        PanelAllFilters.SetActive(false);
+                        Filter = 2;
+                        id = data.id;
+                        ShowAllStories();
+                        Debug.Log(data.id);
+                    });
                     newButton.GetComponent<DataButton>().ButtonDelete.onClick.AddListener(delegate {
                         PanelInfo.SetActive(true);
                         PanelDelete.SetActive(true);
@@ -117,6 +126,14 @@ public class CatalogController : DefaultSceneController
                     GameObject newButton = Instantiate(PrefabButton, TagsRect.content.transform);
                     newButton.GetComponentInChildren<Text>().text = data.name;
 
+                    newButton.GetComponent<DataButton>().ButtonInfo.onClick.AddListener(delegate {
+                        PanelAllBooks.SetActive(true);
+                        PanelAllFilters.SetActive(false); 
+                        Filter = 3;
+                        id = data.id;
+                        ShowAllStories();
+                        Debug.Log(data.id);
+                    });
                     newButton.GetComponent<DataButton>().ButtonDelete.onClick.AddListener(delegate {
                         PanelInfo.SetActive(true);
                         PanelDelete.SetActive(true);
@@ -157,8 +174,11 @@ public class CatalogController : DefaultSceneController
                     newButton.GetComponentInChildren<Text>().text = data.name;
 
                     newButton.GetComponent<DataButton>().ButtonInfo.onClick.AddListener(delegate {
+                        PanelAllBooks.SetActive(true);
+                        PanelAllFilters.SetActive(false); 
                         Filter = 1;
-
+                        id = data.id;
+                        ShowAllStories();
                         Debug.Log(data.id); 
                     });
                     newButton.GetComponent<DataButton>().ButtonDelete.onClick.AddListener(delegate {
@@ -266,7 +286,10 @@ public class CatalogController : DefaultSceneController
 
     public void ShowAllStories()
     {
-        StartCoroutine(ShowStory());
+        if (Filter != 0)
+            StartCoroutine(ShowStoryWithFilter());
+        else 
+            StartCoroutine(ShowStory());
         GameObject[] Buttons = GameObject.FindGameObjectsWithTag("BookButton");
         foreach (GameObject btn in Buttons)
             Destroy(btn.gameObject);
@@ -274,7 +297,42 @@ public class CatalogController : DefaultSceneController
         AllBooks.GetComponentInChildren<GridLayoutGroup>().constraintCount =
             (int)Math.Ceiling((AllBooks.GetComponent<RectTransform>().rect.width - 10) / PrefabBook.GetComponent<RectTransform>().rect.width) - 1;
     }
+    IEnumerator ShowStoryWithFilter()
+    {
+        string path = "";
+        if (Filter == 1) path = "api/authors/" + id;
+        if (Filter == 2) path = "api/genres/" + id;
+        if (Filter == 3) path = "api/tags/" + id;
+        using (UnityWebRequest www = UnityWebRequest.Get(DataStore.basePath + path))
+        {
+            www.SetRequestHeader("Authorization", DataStore.token_type + " " + DataStore.token);
+            //www.SetRequestHeader("Authorization", DataStore.token_type + " " + DataStore.token);
 
+            yield return www.SendWebRequest();
+
+            if (www.result != UnityWebRequest.Result.Success)
+            {
+                Debug.Log(www.error);
+            }
+            else
+            {
+                MiddleStoryPivotRoot storyRoot = JsonConvert.DeserializeObject<MiddleStoryPivotRoot>(www.downloadHandler.text);
+
+
+                foreach (MiddleStoryPivot story in storyRoot.data)
+                {
+                    GameObject newBook = Instantiate(PrefabBook, AllBooks.content.transform);
+                    newBook.GetComponentInChildren<ImageLoader>().url = DataStore.basePath + story.cover_link;
+                    newBook.GetComponentInChildren<Text>().text = story.name_rus;
+                    newBook.GetComponent<Button>().onClick.AddListener(delegate
+                    {
+                        DataStore.id = story.id;
+                        LoadScene("BookScene");
+                    });
+                }
+            }
+        }
+    }
     IEnumerator ShowStory()
     {
         using (UnityWebRequest www = UnityWebRequest.Get(DataStore.basePath + "api/stories"))
@@ -336,6 +394,7 @@ public class CatalogController : DefaultSceneController
     {
         DataStore.Search = false;
         InputQuary.text = "";
+        Filter = 0;
         ShowAllStories();
     }
 

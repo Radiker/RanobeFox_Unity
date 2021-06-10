@@ -16,6 +16,39 @@ public class MainController : DefaultSceneController
     {
         InputQuary = GameObject.Find("InputQuary").GetComponent<InputField>();
         StartCoroutine(ShowLatestStory());
+        StartCoroutine(ShowTopStory());
+    }
+
+    IEnumerator ShowTopStory()
+    {
+        using (UnityWebRequest www = UnityWebRequest.Get(DataStore.basePath + "api/stories/top"))
+        {
+            www.SetRequestHeader("Authorization", DataStore.token_type + " " + DataStore.token);
+
+            yield return www.SendWebRequest();
+
+            if (www.result != UnityWebRequest.Result.Success)
+            {
+                Debug.Log(www.error);
+            }
+            else
+            {
+                StoryRoot storyRoot = JsonConvert.DeserializeObject<StoryRoot>(www.downloadHandler.text);
+
+                ScrollRect TopBook = GameObject.Find("Top Book").GetComponent<ScrollRect>();
+
+                foreach (Story story in storyRoot.data)
+                {
+                    GameObject newBook = Instantiate(PrefabButtonBook, TopBook.content.transform);
+                    newBook.GetComponentInChildren<ImageLoader>().url = DataStore.basePath + story.cover_link;
+                    newBook.GetComponentInChildren<Text>().text = story.name_rus;
+                    newBook.GetComponent<Button>().onClick.AddListener(delegate {
+                        DataStore.id = story.id;
+                        LoadScene("BookScene");
+                    });
+                }
+            }
+        }
     }
 
     IEnumerator ShowLatestStory()
@@ -23,7 +56,6 @@ public class MainController : DefaultSceneController
         using (UnityWebRequest www = UnityWebRequest.Get(DataStore.basePath + "api/stories/latest"))
         {
             www.SetRequestHeader("Authorization", DataStore.token_type + " " + DataStore.token);
-            //www.SetRequestHeader("Authorization", DataStore.token_type +  " "+ DataStore.token);
 
             yield return www.SendWebRequest();
 
