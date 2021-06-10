@@ -1,6 +1,5 @@
 using Newtonsoft.Json;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
@@ -8,6 +7,7 @@ using static Response;
 
 public class CreateChapterController : DefaultSceneController
 {
+    //Поля ввода информации о главе
     private InputField InputName;
     private InputField InputNumber;
     private InputField InputDescription;
@@ -15,39 +15,47 @@ public class CreateChapterController : DefaultSceneController
     // Start is called before the first frame update
     void Start()
     {
+        //Находим поля ввода на сцене
         InputName = GameObject.Find("InputName").GetComponent<InputField>();
         InputNumber = GameObject.Find("InputNumber").GetComponent<InputField>();
         InputDescription = GameObject.Find("InputDescription").GetComponent<InputField>();
     }
 
+    //Обработчик нажатия кнопки создать
     public void OnButtonCreate()
     {
+        //Параллельный запуск функции
         StartCoroutine(CreateBook());
     }
 
     IEnumerator CreateBook()
     {
+        //Создаем форму 
         WWWForm form = new WWWForm();
+        //Добавляем поля в форму запроса
         form.AddField("name", InputName.text);
         form.AddField("number", InputNumber.text);
         form.AddField("text", InputDescription.text);
 
-        //using (UnityWebRequest www = UnityWebRequest.Post(DataStore.basePath + "api/stories/" + DataStore.id+ "/feedback", form))
+        //Создаем Post запрос с формой
         using (UnityWebRequest www = UnityWebRequest.Post(DataStore.basePath + "api/stories/" + DataStore.id + "/chapters", form))
         {
+            //Добавляем заголовок авторизации
             www.SetRequestHeader("Authorization", DataStore.token_type + " " + DataStore.token);
-            //www.SetRequestHeader("Authorization", "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIyIiwianRpIjoiY2EyMmU1MzEwNjM3MDFjZmY4YTMwYjQyZjgzZDEyODVjZDI1NjFiNjMyMjFlY2E3ZDkyMjEwZGVlOGFhMmM1MDYxMTlhMDg3Yzk0NmM0ZjYiLCJpYXQiOjE2MjIwNDM2NzIuMjQ5MjA3LCJuYmYiOjE2MjIwNDM2NzIuMjQ5MjE0LCJleHAiOjE2NTM1Nzk2NzIuMjM1MTQ3LCJzdWIiOiIxIiwic2NvcGVzIjpbXX0.DsolNt_LeIE9n8kL63rrXoTpWULDX5xhzNt4ZODQRWpDGgY3OHcyfji-Qo1opxByvqrCnFqoWpL-30_hwkQXmDZS9TPPuzZbgG6y-oHGbQUC_nwI54rVBGZ77UAjyX12PIc9BQdk1Ka1v-ChHNbAuI-ei1MhLYpvnPiqrp4Eon8Lo0Fzz30EcI64mqe80mp_8chwXTOcWbm7K0-OhyUDOMylJhiEuWF6Zp4JPoDKg8QjSLnyfhGZeRDDgTXRHzLHeZiaTm4rmo4TknrJhY2ySbzXZGTLBCkcPhr_XOhRjBBDQc1OzsqZQdC6lnd99SWdnAt9YKEtp1MXlRt9tcH9DzeqiM2c2m2UihkKpuAWoGSM3I4hzuopv3mauQxDi4-K-eZ7oqtF-EnIxDzVx3abwqOYUgR3Lv2KLX-YdoJa0hgdijM0TOkJdMkz2rwvbcfb8lkL0RJlZA3OySv_fGJt1aLbsmXtl_XD6ii-DbC52llVpbe5fYjl6plGGifuL5ux_n4uaHpUP6MjecIsmaJ1RASTwixBlf8KHl5YZLGREmFz2lRNd9tMV4h4FYdbVZJrra46lb2B2xkDbEchQXrlN7DhS1ogOLXIZ17yYL-JZ3OcMT7ri7BVZk2WYFyOnJz895nz_jR569wKEd1NYYomPKXr8lh7PfQUbNTON3PrvfU");
+            //Отправляем запрос
             yield return www.SendWebRequest();
-
+            //Проверяем результат
             if (www.result != UnityWebRequest.Result.Success)
             {
                 Debug.Log(www.error);
             }
             else
             {
-                FulllChapterRoot middleStoryRoot = JsonConvert.DeserializeObject<FulllChapterRoot>(www.downloadHandler.text);
-
+                //Конвертируем результат из JSON в класс FullChapterRoot
+                FullChapterRoot middleStoryRoot = JsonConvert.DeserializeObject<FullChapterRoot>(www.downloadHandler.text);
+                //Присвоение id в хранилище значения id книги
                 DataStore.id = middleStoryRoot.data.story_id;
+                //Загрузка сцены
                 LoadScene("BookScene");
             }
         }

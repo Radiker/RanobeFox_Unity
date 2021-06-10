@@ -44,6 +44,8 @@ public class StoryController : DefaultSceneController
             }
             else
             {
+                Debug.Log(www.url);
+                Debug.Log(www.uri);
                 FullStoryRoot root = JsonConvert.DeserializeObject<FullStoryRoot>(www.downloadHandler.text);
 
                 GameObject CoverImage = Instantiate(cover, scrollRect.content.transform);
@@ -86,7 +88,7 @@ public class StoryController : DefaultSceneController
 
                 label = Instantiate(text, scrollRect.content.transform);
                 label.GetComponentInChildren<Text>().text = "";
-                foreach (Genre genres in root.data[0].genres)
+                foreach (AdditionData genres in root.data[0].genres)
                 {
                     label.GetComponentInChildren<Text>().text += genres.name+"; ";
                 }
@@ -97,7 +99,7 @@ public class StoryController : DefaultSceneController
 
                 label = Instantiate(text, scrollRect.content.transform);
                 label.GetComponentInChildren<Text>().text = "";
-                foreach (Tag tags in root.data[0].tags)
+                foreach (AdditionData tags in root.data[0].tags)
                 {
                     label.GetComponentInChildren<Text>().text += tags.name + "; ";
                 }

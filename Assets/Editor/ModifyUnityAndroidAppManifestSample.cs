@@ -94,22 +94,26 @@ internal class AndroidManifest : AndroidXmlDocument
 
     internal void SetApplicationLegacyExternalStorage()
     {
+        //<application ... android:requestLegacyExternalStorage="true" ... />
         ApplicationElement.Attributes.Append(CreateAndroidAttribute("requestLegacyExternalStorage", "true"));
     }
 
     internal void SetStartingActivityName(string activityName)
     {
+        //<application android:name= $activityName ...>
         GetActivityWithLaunchIntent().Attributes.Append(CreateAndroidAttribute("name", activityName));
     }
 
 
     internal void SetHardwareAcceleration()
     {
+        //<application android:hardwareAccelerated="true" ...>
         GetActivityWithLaunchIntent().Attributes.Append(CreateAndroidAttribute("hardwareAccelerated", "true"));
     }
 
     internal void SetStoragePermission()
     {
+        //<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
         var manifest = SelectSingleNode("/manifest");
         XmlElement child = CreateElement("uses-permission");
         manifest.AppendChild(child);
