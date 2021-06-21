@@ -16,6 +16,7 @@ public class CreateBookController : DefaultSceneController
     private InputField InputDescription;
     //Путь до загружаемого файла
     private string CoverPath;
+    FileInfo[] files;
 
     [Header("Кнопка выбора файла")]
     public GameObject FileIcon;
@@ -38,7 +39,7 @@ public class CreateBookController : DefaultSceneController
         //Инициализируем класс для работы папками
         DirectoryInfo dirInfo = new DirectoryInfo(Application.persistentDataPath);
         //Инициализируем список классов работы с файлами
-        FileInfo[] files;
+        files = null;
         //Включаем отображение области отображения списка иконок файлов
         scrollViewImages.SetActive(true);
         //Ищем все существующие объекты иконок изображений
@@ -52,22 +53,49 @@ public class CreateBookController : DefaultSceneController
         dirInfo = new DirectoryInfo(GetAndroidInternalFilesDir());
         //Отбираем в папке файлы необходимых расширений
         files = new string[] { "*.jpeg", "*.jpg", "*.png" }.SelectMany(ext => dirInfo.EnumerateFiles(ext, SearchOption.AllDirectories)).ToArray();
-        //Проходимся по всем файлам
-        foreach (FileInfo file in files)
+        //Запускаем загрузку файлов
+        if(files.Length != 0)
+            StartCoroutine(LoadFromFile(0));
+    }
+
+    IEnumerator LoadFromFile(int i)
+    {
+        //Создаем объект иконки изображения
+        FileIconButton fileIcon = Instantiate(FileIcon, scrollViewImages.GetComponent<ScrollRect>().content.transform).GetComponent<FileIconButton>();
+        //Меняем подпись объекта на имя файла
+        fileIcon.fileNameText.text = files[i].Name;
+
+        //Добавляем обработчик события по нажатию
+        fileIcon.GetComponent<Button>().onClick.AddListener(delegate {
+            //Сохраняем путь до файла
+            CoverPath = files[i].FullName;
+            //Отображаем полный путь до файла
+            TextPathCover.text = CoverPath;
+            //Скрываем область просмотр файлов
+            scrollViewImages.SetActive(false);
+        });
+
+        UnityWebRequest www = UnityWebRequestTexture.GetTexture("file://" + files[i].FullName);
+        //Отправляем запрос
+        yield return www.SendWebRequest();
+        //Проверяем результат запроса
+        if (www.result != UnityWebRequest.Result.Success)
+            Debug.Log(www.error);
+        else
         {
-            //Создаем объект иконки изображения
-            FileIconButton fileIcon = Instantiate(FileIcon, scrollViewImages.GetComponent<ScrollRect>().content.transform).GetComponent<FileIconButton>();
-            //Меняем подпись объекта на имя файла
-            fileIcon.fileNameText.text = file.Name;
-            //Добавляем обработчик события по нажатию
-            fileIcon.GetComponent<Button>().onClick.AddListener(delegate {
-                //Сохраняем путь до файла
-                CoverPath = file.FullName;
-                //Отображаем полный путь до файла
-                TextPathCover.text = CoverPath;
-                //Скрываем область просмотр файлов
-                scrollViewImages.SetActive(false);
-            });
+            //Получаем текстуру из результата
+            Texture2D texture = ((DownloadHandlerTexture)www.downloadHandler).texture as Texture2D;
+            fileIcon.GetComponentInChildren<AspectRatioFitter>().aspectRatio = (float)texture.width / (float)texture.height;
+            //Создаем спрайт на основе текстуры
+            Sprite webSprite =
+                Sprite.Create(texture, new Rect(0.0f, 0.0f, texture.width, texture.height), new Vector2(0.5f, 0.5f), 100.0f);
+            //Присвоение спрайта изображению
+            fileIcon.GetComponentInChildren<Image>().sprite = webSprite;
+        }
+        if (i + 1 < files.Length)
+        {
+            i++;
+            StartCoroutine(LoadFromFile(i));
         }
     }
 
