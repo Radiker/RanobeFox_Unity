@@ -20,7 +20,7 @@ public class Response
     }
     public class RegistrRoot : Root
     {
-        public List<Registr> data { get; set; }
+        public Registr data { get; set; }
     }
     public class AuthorRoot : Root
     {

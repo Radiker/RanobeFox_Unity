@@ -96,7 +96,7 @@ public class AuthController : DefaultSceneController
                 //Конвертируем результат из JSON в класс RegistrRoot
                 RegistrRoot registrRoot = JsonConvert.DeserializeObject<RegistrRoot>(www.downloadHandler.text);
                 //Получаем данные из результата
-                DataStore.token = registrRoot.data[0].token;
+                DataStore.token = registrRoot.data.token;
                 //Загружаем главное меню
                 LoadScene("MainScene");
             }
